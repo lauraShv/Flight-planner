@@ -17,13 +17,18 @@ namespace FlightPlanner.Models
             newFlight.Id = _id;
             _id++;
             AllFlights.Add(newFlight);
-
+            AirportStorage.AddAirport(newFlight);
             return newFlight; 
         }
 
         public static Flight FindFlight(int id)
         {
             return AllFlights.FirstOrDefault(x => x.Id == id);
+        }
+
+        public static void IsFlightValid(SearchFlightsRequest request)
+        {
+            
         }
 
     }
