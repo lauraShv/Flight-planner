@@ -157,6 +157,7 @@
     <Compile Include="Areas\HelpPage\XmlDocumentationProvider.cs" />
     <Compile Include="Attributes\BasicAuthentificationAttribute.cs" />
     <Compile Include="Controllers\AdminApiController.cs" />
+    <Compile Include="Controllers\CustomerController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\TestingApiController.cs" />
     <Compile Include="Controllers\ValuesController.cs" />
@@ -167,6 +168,7 @@
     <Compile Include="Models\Airport.cs" />
     <Compile Include="Models\Flight.cs" />
     <Compile Include="Models\FlightStorage.cs" />
+    <Compile Include="Models\PageResult.cs" />
     <Compile Include="Models\SearchFlightsRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

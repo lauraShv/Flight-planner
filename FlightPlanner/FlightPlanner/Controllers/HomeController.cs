@@ -20,16 +20,6 @@ namespace FlightPlanner.Controllers
             return View();
         }
 
-        [System.Web.Http.Route("api/flights/{id}")]
-        public Flight FindFlightById (int id)
-        {
-            if (FlightStorage.AllFlights.Exists(x => x.Id == id))
-            {
-                return FlightStorage.AllFlights.FirstOrDefault(flight => flight.Id == id);
-            }
-
-            return null;
-        }
 
     }
 }
