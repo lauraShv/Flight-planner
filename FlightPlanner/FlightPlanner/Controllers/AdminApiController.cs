@@ -13,12 +13,12 @@ namespace FlightPlanner.Controllers
     [BasicAuthentification]
     public class AdminApiController : ApiController
     {
-        private static readonly object _locker = new object();
+        private static readonly object _lock = new object();
 
         [Route("admin-api/flights/{id}")]
         public IHttpActionResult GetFlights(int id)
         {
-            lock (_locker)
+            lock (_lock)
             {
                 var flight = FlightStorage.FindFlight(id);
                 return flight == null ? (IHttpActionResult) NotFound() : Ok(flight);
@@ -29,7 +29,7 @@ namespace FlightPlanner.Controllers
         [HttpPut]
         public IHttpActionResult PutFlight(AddFlightRequest newFlight)
         {
-            lock (_locker)
+            lock (_lock)
             {
                 if (IsFlightNullOrEmpty(newFlight))
                 {
@@ -67,7 +67,7 @@ namespace FlightPlanner.Controllers
         [Route("admin-api/flights/{id}")]
         public IHttpActionResult DeleteFlight(int id)
         {
-            lock (_locker)
+            lock (_lock)
             {
                 var flightToRemove = FlightStorage.AllFlights.SingleOrDefault(x => x.Id == id);
                 if (flightToRemove != null)

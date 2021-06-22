@@ -10,6 +10,5 @@ namespace FlightPlanner.Models
         public int Page { get; set; }
         public int TotalItems { get; set; }
         public List<Flight> Items = new List<Flight>();
-
     }
 }

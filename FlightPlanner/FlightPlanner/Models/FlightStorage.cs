@@ -14,11 +14,10 @@ namespace FlightPlanner.Models
 
         public static Flight AddFlight(Flight newFlight)
         {
-            newFlight.Id = _id;
+            newFlight.Id = _id; 
             _id++;
             AllFlights.Add(newFlight);
-            AirportStorage.AddAirport(newFlight);
-            return newFlight; 
+            return newFlight;
         }
 
         public static Flight FindFlight(int id)
@@ -26,10 +25,12 @@ namespace FlightPlanner.Models
             return AllFlights.FirstOrDefault(x => x.Id == id);
         }
 
-        public static void IsFlightValid(SearchFlightsRequest request)
+        public static List<Flight> IsTheFlightMatching(SearchFlightsRequest flight)
         {
-            
+            return AllFlights.Where(x =>
+                x.From.AirportName == flight.From &&
+                x.To.AirportName == flight.To &&
+                x.DepartureTime == flight.DepartureDate).ToList();
         }
-
     }
 }
