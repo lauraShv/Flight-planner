@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Results;
 using FlightPlanner.Attributes;
+using FlightPlanner.DbContext;
 using FlightPlanner.Models;
 
 namespace FlightPlanner.Controllers
@@ -20,8 +22,13 @@ namespace FlightPlanner.Controllers
         {
             lock (_lock)
             {
-                var flight = FlightStorage.FindFlight(id);
-                return flight == null ? (IHttpActionResult) NotFound() : Ok(flight);
+                using (var ctx = new FlightPlannerDbContext())
+                {
+                    var flight = ctx.Flights.Include(f => f.From).Include(f => f.To).SingleOrDefault(f => f.Id == id);
+                    return flight == null ? (IHttpActionResult) NotFound() : Ok(flight);
+                }
+                //var flight = FlightStorage.FindFlight(id);
+                
             }
         }
 
@@ -58,7 +65,13 @@ namespace FlightPlanner.Controllers
 
                 output.Carrier = newFlight.Carrier;
 
-                FlightStorage.AddFlight(output);
+                //FlightStorage.AddFlight(output);
+
+                using (var ctx = new FlightPlannerDbContext())
+                {
+                    ctx.Flights.Add(output);
+                    ctx.SaveChanges();
+                }
 
                 return Created("", output);
             }
@@ -69,22 +82,37 @@ namespace FlightPlanner.Controllers
         {
             lock (_lock)
             {
-                var flightToRemove = FlightStorage.AllFlights.SingleOrDefault(x => x.Id == id);
-                if (flightToRemove != null)
+                using (var ctx = new FlightPlannerDbContext())
                 {
-                    FlightStorage.AllFlights.Remove(flightToRemove);
+                    var flightToRemove = ctx.Flights.SingleOrDefault(x => x.Id == id);
+                    if (flightToRemove != null)
+                    {
+                        ctx.Flights.Remove(flightToRemove);
+                        ctx.SaveChanges();
+                    }
                 }
 
                 return Ok();
+
+                //var flightToRemove = FlightStorage.AllFlights.SingleOrDefault(x => x.Id == id);
+                //if (flightToRemove != null)
+                //{ 
+                //    FlightStorage.AllFlights.Remove(flightToRemove);
+                //}
+                //
+                //return Ok();
             }
         }
 
         public bool FlightAlreadyExists(AddFlightRequest newFlight)
         {
-            return FlightStorage.AllFlights.Any(x => x.From.AirportName == newFlight.From.AirportName &&
-                                                                 x.To.AirportName == newFlight.To.AirportName &&
-                                                                 x.DepartureTime == newFlight.DepartureTime &&
-                                                                 x.ArrivalTime == newFlight.ArrivalTime);
+            using (var ctx = new FlightPlannerDbContext())
+            {
+                return ctx.Flights.Any(x => x.From.AirportName == newFlight.From.AirportName &&
+                                                         x.To.AirportName == newFlight.To.AirportName &&
+                                                         x.DepartureTime == newFlight.DepartureTime &&
+                                                         x.ArrivalTime == newFlight.ArrivalTime);
+            }
         }
 
         public bool IsFlightNullOrEmpty(AddFlightRequest newFlight)

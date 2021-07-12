@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using FlightPlanner.DbContext;
 using FlightPlanner.Models;
 
 namespace FlightPlanner.Controllers
@@ -14,8 +15,14 @@ namespace FlightPlanner.Controllers
         [HttpPost ]
         public IHttpActionResult Clear()
         {
-            FlightStorage.AllFlights.Clear();
-            return Ok();
+            using (var ctx = new FlightPlannerDbContext())
+            {
+                ctx.Flights.RemoveRange(ctx.Flights);
+                ctx.Airports.RemoveRange(ctx.Airports);
+                ctx.SaveChanges();
+                return Ok();
+
+            }
         }
     }
 }

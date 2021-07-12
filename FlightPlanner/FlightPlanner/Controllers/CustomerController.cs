@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using System.Data.Entity;
 using System.Linq;
-using System.Net;
-using System.Net.Http;
 using System.Web.Http;
-using System.Web.Management;
+using FlightPlanner.DbContext;
 using FlightPlanner.Models;
+
 
 namespace FlightPlanner.Controllers
 {
@@ -21,25 +20,20 @@ namespace FlightPlanner.Controllers
             {
                 var theAirport = search.ToLower().Trim();
                 var result = new List<Airport>();
-
-                foreach (var flight in FlightStorage.AllFlights)
+                using (var ctx = new FlightPlannerDbContext())
                 {
-                    if (flight.From.AirportName.ToLower().Contains(theAirport) ||
-                        flight.From.City.ToLower().Contains(theAirport) ||
-                        flight.From.Country.ToLower().Contains(theAirport))
+                    foreach (var airport in ctx.Airports)
                     {
-                        result.Add(flight.From);
+                        if (airport.AirportName.ToLower().Contains(theAirport) ||
+                            airport.City.ToLower().Contains(theAirport) ||
+                            airport.Country.ToLower().Contains(theAirport))
+                        {
+                            result.Add(airport);
+                        }
                     }
 
-                    if (flight.To.AirportName.ToLower().Contains(theAirport) ||
-                        flight.To.City.ToLower().Contains(theAirport) ||
-                        flight.To.Country.ToLower().Contains(theAirport))
-                    {
-                        result.Add(flight.To);
-                    }
+                    return result.Count == 0 ? (IHttpActionResult)NotFound() : Ok(result);
                 }
-
-                return result.Count == 0 ? (IHttpActionResult) NotFound() : Ok(result);
             }
         }
 
@@ -71,15 +65,17 @@ namespace FlightPlanner.Controllers
                 }
 
                 var result = new PageResult();
-                
-                foreach (var flight in FlightStorage.AllFlights)
+                using (var ctx = new FlightPlannerDbContext())
                 {
-                    if (flight.From.AirportName == request.From &&
-                        flight.To.AirportName == request.To &&
-                        flight.DepartureTime.Substring(0, 10) == request.DepartureDate)
+                    foreach (Flight flight in ctx.Flights.Include(f => f.From).Include(f => f.To).ToList())
                     {
-                        result.TotalItems++;
-                        result.Items.Add(flight);
+                        if (flight.From.AirportName == request.From &&
+                            flight.To.AirportName == request.To &&
+                            flight.DepartureTime.Substring(0, 10) == request.DepartureDate)
+                        {
+                            result.TotalItems++;
+                            result.Items.Add(flight);
+                        }
                     }
                 }
 
