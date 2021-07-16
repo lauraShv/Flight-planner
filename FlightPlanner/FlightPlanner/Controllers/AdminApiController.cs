@@ -27,7 +27,6 @@ namespace FlightPlanner.Controllers
                     var flight = ctx.Flights.Include(f => f.From).Include(f => f.To).SingleOrDefault(f => f.Id == id);
                     return flight == null ? (IHttpActionResult) NotFound() : Ok(flight);
                 }
-                //var flight = FlightStorage.FindFlight(id);
                 
             }
         }
@@ -65,8 +64,6 @@ namespace FlightPlanner.Controllers
 
                 output.Carrier = newFlight.Carrier;
 
-                //FlightStorage.AddFlight(output);
-
                 using (var ctx = new FlightPlannerDbContext())
                 {
                     ctx.Flights.Add(output);
@@ -93,14 +90,6 @@ namespace FlightPlanner.Controllers
                 }
 
                 return Ok();
-
-                //var flightToRemove = FlightStorage.AllFlights.SingleOrDefault(x => x.Id == id);
-                //if (flightToRemove != null)
-                //{ 
-                //    FlightStorage.AllFlights.Remove(flightToRemove);
-                //}
-                //
-                //return Ok();
             }
         }
 

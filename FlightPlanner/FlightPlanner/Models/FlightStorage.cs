@@ -7,7 +7,6 @@ namespace FlightPlanner.Models
 {
     public static class FlightStorage
     {
-        //public static List<Flight> AllFlights = new List<Flight>();
         private static int _id;
 
         public static Flight AddFlight(Flight newFlight)
